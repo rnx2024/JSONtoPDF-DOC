@@ -1,0 +1,23 @@
+[project]
+name = "json-image-doc-app"
+version = "0.1.0"
+description = "Convert JSON + optional image into PDF or DOCX using FastAPI"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "python-docx>=1.1",
+    "pdfkit>=1.0",
+    "python-multipart>=0.0.9",
+]
+
+# Flat layout: explicitly declare packages and modules
+[tool.setuptools]
+package-dir = {"" = "."}
+packages = ["routes", "services", "renderers", "utils"]
+py-modules = ["main", "config", "schemas"]
+include-package-data = false
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"

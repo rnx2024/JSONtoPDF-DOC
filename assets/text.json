@@ -1,0 +1,20 @@
+{
+  "title": "n8n Webhook Setup Guide",
+  "sections": [
+    {
+      "heading": "Step 1 – Create Webhook Node",
+      "type": "paragraph",
+      "text": "Drag a Webhook node into your workflow. In the node settings, choose the HTTP method (commonly POST for receiving data, GET for testing), and set a unique path (e.g., /webhook-test). This generates a public URL once the workflow is active. Trigger this URL by sending an HTTP request from an external service, form, or API client. Ensure the workflow is set to production mode if used outside test runs."
+    },
+    {
+      "heading": "Step 2 – Configure Data Processing",
+      "type": "paragraph",
+      "text": "The Webhook node captures the request body, headers, and query parameters. Use Set or Function nodes to transform or clean this data, or route it with IF nodes based on conditions. If handling file uploads, enable the binary data option and connect downstream nodes such as Google Drive or S3 to store the files."
+    },
+    {
+      "heading": "Step 3 – Add Respond to Webhook",
+      "type": "paragraph",
+      "text": "Place a Respond to Webhook node at the end of the workflow. This controls the response returned to the caller, which can be JSON, plain text, or dynamic data processed within the workflow. Without this node, the webhook returns a default text immediately. For production, always define explicit responses, validate input with Code/IF nodes, and add error handling for clear feedback to external systems."
+    }
+  ]
+}

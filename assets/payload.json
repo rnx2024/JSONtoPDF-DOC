@@ -1,0 +1,17 @@
+{
+  "title": "n8n Webhook Setup Guide",
+  "sections": [
+    {"heading":"Overview","type":"paragraph","text":"How to build a webhook flow and return results."},
+    {
+      "heading":"Key Settings",
+      "type":"kv",
+      "items":{"HTTP Method":"POST","Path":"/webhook-test","Auth":"None"}
+    },
+    {
+      "heading":"KPI Snapshot",
+      "type":"table",
+      "headers":["Metric","Current","Target"],
+      "rows":[["Latency (p95)","812 ms","<900 ms"],["Success Rate","99.2%","99%+"]]
+    }
+  ]
+}
