@@ -4,7 +4,10 @@ WKHTMLTOPDF_PATH=C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe
 ~~~
 
 **Debian/Ubuntu**
-`~~~bash`
+~~~bash
+sudo apt-get update && sudo apt-get install -y wkhtmltopdf
+~~~
+
 sudo apt-get update && sudo apt-get install -y wkhtmltopdf
 ~~~
 
@@ -20,7 +23,8 @@ Open `http://127.0.0.1:8000/docs`.
 
 ## API
 
-### GET `/health`
+### GET `/healthz`
+
 Health check for service and wkhtmltopdf.
 
 ### POST `/render`
