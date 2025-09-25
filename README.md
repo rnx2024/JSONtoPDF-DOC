@@ -1,48 +1,67 @@
-Add that `bin` to `PATH` or set in `.env`:
-~~~ini
+# JSON → PDF / DOCX Converter API
+
+A FastAPI service that accepts JSON data (and optional images) and generates professional PDF or DOCX reports.  
+Internally, the service transforms JSON into styled HTML, then renders it with **wkhtmltopdf** (for PDFs) or **python-docx** (for DOCX).
+
+---
+
+## Features
+
+- Accepts **JSON data** as inline text or uploaded file.  
+- Embeds an optional image (PNG/JPEG recommended).  
+- Outputs clean, paragraph-based reports instead of raw tables.  
+- Two output formats: **PDF** or **DOCX**.  
+
+---
+
+## Installation
+
+**1. Clone repo & install dependencies**
+```
+uv sync
+```
+Your pyproject.toml must include:
+```
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "pdfkit",
+  "python-docx",
+  "python-multipart",
+  "python-dotenv"
+]
+```
+**2. Install wkhtmltopdf system binary**
+```
+Windows: Download and install to
+C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe
+
+Add the bin folder to your PATH or set in .env:
+
 WKHTMLTOPDF_PATH=C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe
-~~~
-
-**Debian/Ubuntu**
-~~~bash
-sudo apt-get update && sudo apt-get install -y wkhtmltopdf
-~~~
-
-sudo apt-get update && sudo apt-get install -y wkhtmltopdf
-~~~
-
----
-
-## Run
-~~~bash
+```
+**3. Run app**
+```
 uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
-~~~
-Open `http://127.0.0.1:8000/docs`.
+```
 
----
+Visit http://127.0.0.1:8000/docs
+ for interactive API docs.
 
-## API
-
-### GET `/healthz`
-
-Health check for service and wkhtmltopdf.
-
-### POST `/render`
-Generate report.
-
-**Form fields**
-- `json_text` *(string)* — inline JSON (alt to file).
-- `text` *(file)* — JSON file upload.
-- `image` *(file, optional)* — PNG/JPEG. *(SVG only supported for PDF, not DOCX.)*
-- `output` *(string, required)* — `"pdf"` or `"docx"`.
-- `title` *(string, optional)* — report title.
-
----
-
-## JSON Format
-
-**Recommended schema**
-~~~json
+API Endpoints
+GET /health
+POST /render
+ - Generate a report.
+ - Form-data fields:
+```
+json_text (string) — JSON content inline (alternative to file).
+text (file) — JSON file upload.
+image (file, optional) — PNG or JPEG to embed. (SVG works only in PDF, not DOCX).
+output (string, required) — "pdf" or "docx".
+title (string, optional) — Report title.
+```
+**Recommended schema for JSON format:**
+```
 {
   "title": "Quarterly Review",
   "sections": [
@@ -63,53 +82,21 @@ Generate report.
     }
   ]
 }
-~~~
+```
+**Note:**
+1. sections is an array of objects.
+2. type can be:
+   - "paragraph" → renders <p>…</p>
+   - "list" → renders <ul><li>…</li></ul>
+   - "table" → renders <table>…</table>
 
-`sections[i].type` is one of:
-- `"paragraph"` → `<p>…</p>`
-- `"list"` → `<ul><li>…</li></ul>`
-- `"table"` → `<table>…</table>`
+**Flat dict fallback:**
+If you send a simple JSON dict without sections, keys will be rendered as headings/paragraphs/tables depending on prefix (h1:, h2:, p:, list:, table:).
 
-**Flat dict fallback**  
-If no `sections`, a simple dict is rendered by key prefixes: `h1:`, `h2:`, `p:`, `list:`, `table:`.
-
----
-
-## Image Guidelines
-- PNG/JPEG supported for **PDF** and **DOCX**.
-- SVG works for **PDF** only (DOCX not supported).
-- Images auto-scale to page width (`max-width: 100%`) and center.
-- Keep size reasonable (< 1 MB recommended).
-
----
-
-## Examples (PowerShell)
-
-**1) JSON text → PDF**
-~~~powershell
-Invoke-WebRequest -Method POST "http://127.0.0.1:8000/render" `
-  -Form @{
-    "json_text" = '{"title":"My Report","sections":[{"heading":"Intro","type":"paragraph","text":"Hello"}]}'
-    "output"    = "pdf"
-    "title"     = "Demo Report"
-  } -OutFile demo.pdf
-~~~
-
-**2) JSON file + image → DOCX**
-~~~powershell
-Invoke-WebRequest -Method POST "http://127.0.0.1:8000/render" `
-  -Form @{
-    "text"   = Get-Item ".\text.json"
-    "image"  = Get-Item ".\chart.png"
-    "output" = "docx"
-    "title"  = "Report With Image"
-  } -OutFile demo.docx
-~~~
-
----
-
-## Notes
-- For production containers, install `wkhtmltopdf` in the image to avoid host dependency issues.
-- Validate input JSON before calling `/render`.
-
-YOLO test.
+**Image Guidelines**
+```
+Supported formats: PNG, JPEG (both PDF and DOCX).
+SVG: works in PDF but not in DOCX (raises error).
+Images are scaled to page width (max-width:100%) and centered.
+Keep file size reasonable (<1 MB recommended)
+```
